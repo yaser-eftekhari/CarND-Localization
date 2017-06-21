@@ -63,7 +63,6 @@ inline std::vector<LandmarkObs> find_prediction(const Map map) {
 
 		output.push_back(landmark_converted);
 	}
-
 	return output;
 }
 // x, y, theta are the car positions in the MAP coordinates
@@ -90,16 +89,30 @@ inline std::vector<LandmarkObs> transform_observations(const std::vector<Landmar
 	return obs_transformed_list;
 }
 
-// Assumption: landmark ID is one more than the index of the landmark on the first input
 inline double multivariate_normal_distribution(	const std::vector<LandmarkObs> predicted,
 																								const std::vector<LandmarkObs> observations,
 																								const double std_x,
 																								const double std_y) {
 	double weight = 1;
+
 	for(int i = 0; i < observations.size(); i++) {
 		LandmarkObs obs = observations[i];
-		int lanmark_id = obs.id;
-		LandmarkObs pred = predicted[lanmark_id - 1];
+		int landmark_id = obs.id;
+		bool found = false;
+		int index = 0;
+
+		for(index = 0; index < predicted.size(); index++) {
+			if(predicted[index].id == landmark_id) {
+				found = true;
+				break;
+			}
+		}
+		if(!found) {
+			std::cout << "Landmark not found!" << std::endl;
+			throw;
+		}
+
+		LandmarkObs pred = predicted[index];
 
 		double dx2 = (pred.x - obs.x)*(pred.x - obs.x);
 		double dy2 = (pred.y - obs.y)*(pred.y - obs.y);
@@ -107,7 +120,6 @@ inline double multivariate_normal_distribution(	const std::vector<LandmarkObs> p
 		double vary = std_y * std_y;
 		weight *= exp(-0.5*(dx2/varx + dy2/vary))/(std_x*std_y*2*M_PI);
 	}
-
 	return weight;
 }
 

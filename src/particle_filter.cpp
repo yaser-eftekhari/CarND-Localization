@@ -142,10 +142,6 @@ void ParticleFilter::resample() {
 
 	vector<Particle> sampled_particles;
 
-	for(int i = 0; i < weights.size(); i++) {
-		// cout << "resample - weights[" << i << "] = " << weights[i] << endl;
-	}
-
 	// Resample particles with replacement with probability proportional to their weight.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
 	for(int i = 0; i < num_particles; i++) {
